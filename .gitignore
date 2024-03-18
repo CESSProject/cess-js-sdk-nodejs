@@ -1,0 +1,5 @@
+node_modules/
+file/
+package-lock.json
+test/
+tmp.txt
