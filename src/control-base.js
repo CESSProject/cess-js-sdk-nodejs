@@ -4,6 +4,7 @@
  */
 const util = require("../src/util/index");
 const defaultConfig = require("../src/default-config");
+const { encodeAddress } = require("@polkadot/util-crypto");
 
 module.exports = class ControlBase {
   constructor(api, keyring, isDebug = false) {
@@ -135,8 +136,13 @@ module.exports = class ControlBase {
     if (!accountId32 || accountId32.length == 64) {
       return accountId32;
     }
-    const pair = this.keyring.addFromAddress(accountId32);
-    this.keyring.setSS58Format(defaultConfig.keyringOption.ss58Format);
-    return pair.address;
+    return encodeAddress(accountId32, defaultConfig.keyringOption.ss58Format);
+    // const pair = this.keyring.addFromAddress(accountId32);
+    // this.keyring.setSS58Format(defaultConfig.keyringOption.ss58Format);
+    // return pair.address;
+
+    // import { encodeAddress } from '@polkadot/util-crypto';
+    // const SS58Prefix=11330;
+    // const Ss58Address = encodeAddress(multiAddress, SS58Prefix);
   }
 };
