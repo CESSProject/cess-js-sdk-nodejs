@@ -2,10 +2,9 @@ const { ApiPromise, WsProvider, Keyring } = require("@polkadot/api");
 const defaultConfig = require("./default-config");
 
 module.exports = async (config = defaultConfig) => {
-  process.on("uncaughtException", function (err, o) {
+  process.on("uncaughtException", function (err) {
     // console.log('uncaughtException');
-    // console.log(err);
-    // console.log(o);
+    console.error(err);
   });
   let rpcs = config.nodeURL;
   if (!Array.isArray(config.nodeURL)) {
