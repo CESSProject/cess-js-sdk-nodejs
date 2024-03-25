@@ -21,7 +21,7 @@ interface KeyringOption {
 
 declare namespace CESS {
     interface CESSConfig {
-        nodeURL: string;
+        nodeURL: string | string[];
         gatewayURL: string;
         gatewayAddr: string;
         keyringOption: KeyringOption;
