@@ -1,31 +1,16 @@
-const init = require("../init-api");
+const WebSocket = require("ws");
 
-const { ApiPromise, WsProvider, Keyring } = require("@polkadot/api");
-const defaultConfig = require("../default-config");
-
-// const init = require("./init");
-
-async function main() {
-    // let { api } = await init();
-    // console.log('end')
-    // await api.rpc.chain.subscribeNewHeads((lastHeader) => {
-    //     console.log(`last block #${lastHeader.number} has hash ${lastHeader.hash}`);
-    // });
-    for (let url of defaultConfig.nodeURL) {
+module.exports = async function main(urls) {
+    for (let url of urls) {
         let isOK = await checkWS(url);
         if (isOK) {
-            console.log(url)
-            break;
+            return url;
         }
-
     }
+    return null;
 }
-main();
-
-
 async function checkWS(url) {
     return new Promise(async (resolve, reject) => {
-        console.log('testing', url);
         var websocket = new WebSocket(url);
         websocket.onopen = function () {
             console.log('websocket open');
