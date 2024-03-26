@@ -1,30 +1,32 @@
 const WebSocket = require("ws");
 
 module.exports = async function main(urls) {
-    for (let url of urls) {
-        let isOK = await checkWS(url);
-        if (isOK) {
-            return url;
+    return new Promise(async (resolve, reject) => {
+        for (let url of urls) {
+            checkWS(url).then(isOK => {
+                if (isOK) {
+                    resolve(url);
+                }
+            });
         }
-    }
-    return null;
+    });
 }
 async function checkWS(url) {
     return new Promise(async (resolve, reject) => {
-        var websocket = new WebSocket(url);
+        console.log('connecting ', url);
+        const websocket = new WebSocket(url);
         websocket.onopen = function () {
-            console.log('websocket open');
+            console.log("connect success ", url);
             websocket.close();
             resolve(true);
         }
         websocket.onclose = function () {
-            console.log('websocket close');
+            // console.log('websocket close');
             resolve(false);
         }
-        websocket.on('error', function (e) {
-            console.log('ws error ', e.message);
+        websocket.error = function () {
+            // console.log('ws error ', e.message);
             resolve(false);
-        });
-
+        }
     });
 }
