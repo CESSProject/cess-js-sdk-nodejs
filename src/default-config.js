@@ -8,7 +8,7 @@ module.exports = {
     'wss://testnet-rpc0.cess.cloud/ws/',
     'wss://testnet-rpc1.cess.cloud/ws/',
     'wss://testnet-rpc2.cess.cloud/ws/',
-    'wss://testnet-rpc3.cess.cloud/ws/','ws://5.39.82.215:9944/',
+    'wss://testnet-rpc3.cess.cloud/ws/',
   ],
   keyringOption: { type: "sr25519", ss58Format: 11330 },
   gatewayURL: "http://deoss-pub-gateway.cess.cloud/",
