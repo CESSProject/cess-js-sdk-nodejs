@@ -4,6 +4,7 @@
  *
  */
 const _ = require("lodash");
+const moment = require("moment");
 
 module.exports = {
   formatEntries,
@@ -14,6 +15,7 @@ module.exports = {
   formatAddressLong,
   fixed,
   formatTime,
+  formatSpaceInfo
 };
 function formatEntries(result, isNeedSourceKey, isToJson) {
   return result.map(([key, entry]) => {
@@ -62,7 +64,7 @@ function formatBalance(balance) {
   if (isNaN(balance)) {
     return balance;
   }
-  return fixed(parseInt(balance) / 1e18);
+  return balance / 1e18;
 }
 function formatAddress(addr) {
   if (!addr) return "";
@@ -90,4 +92,51 @@ function formatTime(time) {
   } else {
     return m + ":" + s;
   }
+}
+
+
+const GB = 1024 * 1024 * 1024;
+const SECS_IN_DAY = 60 * 60 * 24;
+const BLOCK_TIME = 6; // in seconds
+function formatSpaceInfo(obj, blockHeight) {
+  const result = { ...obj };
+  result.totalSpaceGib = 0;
+  result.totalSpaceStr = "0 GB";
+
+  result.usedSpaceGib = 0;
+  result.usedSpaceStr = "0 GB";
+
+  result.lockedSpaceGib = 0;
+  result.lockedSpaceStr = "0 GB";
+
+  result.remainingSpaceGib = 0;
+  result.remainingSpaceStr = "0 GB";
+
+  result.deadlineTime = "--";
+  result.remainingDays = 0;
+
+  if (result.totalSpace) {
+    result.totalSpaceGib = result.totalSpace / GB;
+    result.totalSpaceStr = formatterSize(result.totalSpace);
+  }
+  if (result.usedSpace) {
+    result.usedSpaceGib = result.usedSpace / GB;
+    result.usedSpaceStr = formatterSize(result.usedSpace);
+  }
+  if (result.lockedSpace) {
+    result.lockedSpaceGib = result.lockedSpace / GB;
+    result.lockedSpaceStr = formatterSize(result.lockedSpace);
+  }
+  if (result.remainingSpace) {
+    result.remainingSpaceGib = result.remainingSpace / GB;
+    result.remainingSpaceStr = formatterSize(result.remainingSpace);
+  }
+  if (result.deadline && blockHeight) {
+    let s = (result.deadline - blockHeight) * BLOCK_TIME;
+    let time = moment().add(s, "s");
+    result.deadlineTime = time.format("YYYY-MM-DD HH:mm:ss");
+    result.remainingDays = parseInt(s / SECS_IN_DAY);
+  }
+
+  return result;
 }
