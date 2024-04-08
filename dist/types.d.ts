@@ -76,11 +76,13 @@ declare namespace CESS {
         constructor(api: ApiPromise, keyring: Keyring, isDebug?: boolean);
         queryBlockHeight(): Promise<number>;
         formatSpaceInfo(spaceInfo: SpaceInfo | undefined, blockHeight: number): SpaceInfoFormatted;
+        subscribeBalance(accountId32: string, subFun: Function): Promise<Function>;
     }
 
     class Space extends ControlBase {
         constructor(api: ApiPromise, keyring: Keyring, isDebug?: boolean);
         userOwnedSpace(accountId32: string): Promise<APIReturnedData>;
+        subscribeUserOwnedSpace(accountId32: string, subFun: Function): Promise<Function>;
         buySpace(mnemonic: string, gibCount: number, subState?: (status: any) => void): Promise<any>;
         expansionSpace(
             mnemonic: string,
