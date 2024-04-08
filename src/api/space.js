@@ -3,6 +3,7 @@
  * @Autor: cess lab
  */
 const ControlBase = require("../control-base");
+const util = require("../util");
 
 module.exports = class Space extends ControlBase {
   constructor(api, keyring, isDebug = false) {

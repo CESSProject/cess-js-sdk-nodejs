@@ -21,6 +21,13 @@ function base58ToIP(u8arr) {
   return uint8ArrayToString(bs58.decode(u8arr));
 }
 
+function sleep(minisec) {
+  return new Promise((resolve, reject) => {
+    setTimeout(function () {
+      resolve();
+    }, minisec);
+  });
+}
 function stringToByte(str) {
   var bytes = new Array();
   var len, c;
@@ -91,6 +98,7 @@ function getDataIfOk(result) {
 }
 
 module.exports = {
+  sleep,
   base58ToIP,
   byteToString,
   getDataIfOk,

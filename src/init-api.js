@@ -26,12 +26,13 @@ module.exports = async (config = defaultConfig) => {
 }
 
 function connect(nodeURL) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     console.log('connecting', nodeURL);
     const provider = new WsProvider(nodeURL);
     const api = new ApiPromise({ provider });
-    api.on("connected", () => {
+    api.on("connected", async() => {
       console.log("connect success ", nodeURL);
+      await api.isReady;
       resolve({ msg: 'ok', api });
     });
     api.on("disconnected", () => {

@@ -6,6 +6,7 @@ const { testnetConfig, wellKnownAcct } = require("./myconfig.cjs");
 const { Space, InitAPI, Common } = require("../");
 const { getDataIfOk } = require("../util");
 
+
 async function main() {
   const { api, keyring } = await InitAPI(testnetConfig);
   const { addr, mnemonic } = wellKnownAcct;
