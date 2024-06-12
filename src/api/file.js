@@ -106,7 +106,7 @@ module.exports = class File extends ControlBase {
   async uploadFile(mnemonic, filePath, bucketName, progressCb) {
     try {
       const pair = this.keyring.createFromUri(mnemonic);
-      accountId32 = pair.address;
+      let accountId32 = pair.address;
       const message = "<Bytes>cess-js-sdk-" + new Date().valueOf() + "</Bytes>";
       const { signU8A } = await this.authSign(mnemonic, message);
       if (!signU8A) {
@@ -129,7 +129,7 @@ module.exports = class File extends ControlBase {
         Message: message,
         Signature: sign,
       };
-      const ret = await fileHelper.upload(
+      const ret = await fileHelper.uploadByChunk(
         this.gatewayURL,
         filePath,
         headers,

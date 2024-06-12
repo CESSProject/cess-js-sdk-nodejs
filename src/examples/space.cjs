@@ -15,12 +15,12 @@ async function main() {
   const common = new Common(api, keyring);
 
   console.log("query userOwnedSpace:");
-  let result = await space.userOwnedSpace("cXfyomKDABfehLkvARFE854wgDJFMbsxwAJEHezRb6mfcAi2y");
+  let result = await space.userOwnedSpace(addr);
   console.log({result});
   const blockHeight = await common.queryBlockHeight();
 
   result = common.formatSpaceInfo(result.data, blockHeight);
-  console.log(result);return;
+  // console.log(result);return;
 
   if (result.totalSpace) {
     console.log("expansionSpace:");

@@ -26,10 +26,10 @@ async function queryFileMetadata(oss, fileHash) {
   console.log(getDataIfOk(result), "\n");
 }
 
-async function uploadFile(oss, accountId32, mnemonic, bucketName) {
+async function uploadFile(oss, mnemonic, bucketName) {
   console.log("uploadFile:", LICENSE_PATH);
-  const result = await oss.uploadFile(mnemonic, accountId32, LICENSE_PATH, bucketName, console.log);
-  console.log(getDataIfOk(result), "\n");
+  const result = await oss.uploadFile(mnemonic, "D:\\a.exe", bucketName, console.log);
+  console.log(result, "\n");
   return result;
 }
 
@@ -55,22 +55,25 @@ async function main() {
   // let result = await ossAuthorze.authorize(mnemonic, gatewayAddr);
   // console.log(getDataIfOk(result), "\n");
 
-  // console.log("queryBucketList:");
-  // const ossBucket = new Bucket(api, keyring);
-  // result = await ossBucket.queryBucketList(addr);
-  // if (result.msg != 'ok') {
-  //   return console.log('query bucket error', result);
-  // }
-  // if (result.data.length == 0) {
-  //   result = await ossBucket.createBucket(mnemonic,  BUCKET_NAME);
-  // } else {
-  //   BUCKET_NAME = result.data[0].key;
-  // }
-  let files = await queryFileList(oss, addr);
-  if (files.msg == "ok" && files.data.length > 0) {
-    await downloadFile(oss, files.data[0].fileHash);
+  console.log("queryBucketList:");
+  const ossBucket = new Bucket(api, keyring);
+  result = await ossBucket.queryBucketList(addr);
+  if (result.msg != 'ok') {
+    return console.log('query bucket error', result);
   }
-  // await uploadFile(oss, mnemonic, BUCKET_NAME);
+  console.log('query bucket result', result);
+  if (result.data.length == 0) {
+    result = await ossBucket.createBucket(mnemonic, BUCKET_NAME);
+    console.log('createBucket result', result);
+  } else {
+    BUCKET_NAME = result.data[0].key;
+  }
+  let files = await queryFileList(oss, addr);
+  console.log({ files });
+  // if (files.msg == "ok" && files.data.length > 0) {
+  //   await downloadFile(oss, files.data[0].fileHash);
+  // }
+  await uploadFile(oss, mnemonic, BUCKET_NAME);
 
   // let tmpFileHash = "0414617e35db30b114360d6ade6f6a980784c5c6052f6d8a8cae90b342d9ccb6";
   // await downloadFile(oss, tmpFileHash);
