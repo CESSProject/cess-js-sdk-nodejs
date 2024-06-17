@@ -28,7 +28,7 @@ async function queryFileMetadata(oss, fileHash) {
 
 async function uploadFile(oss, mnemonic, bucketName) {
   console.log("uploadFile:", LICENSE_PATH);
-  const result = await oss.uploadFile(mnemonic, "D:\\nvm-setup.exe", bucketName, console.log);
+  const result = await oss.uploadFile(mnemonic, "E:\\图片素材\\测试中文测试中文测试中文测2222.png", bucketName, console.log);
   console.log(result, "\n");
   return result;
 }

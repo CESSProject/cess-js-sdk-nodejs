@@ -130,6 +130,7 @@ module.exports = class File extends ControlBase {
         Signature: sign,
       };
       const ret = await fileHelper.uploadByChunk(
+      // const ret = await fileHelper.upload(
         this.gatewayURL,
         filePath,
         headers,

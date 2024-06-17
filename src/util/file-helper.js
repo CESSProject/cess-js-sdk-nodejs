@@ -90,7 +90,7 @@ async function upload(url, filePath, header, log, progressCb) {
           resolve({ msg: "ok", data: res.data });
         })
         .catch((error) => {
-          console.error("Upload fail：", error.message);
+          console.error("Upload fail：", error.response?.data || error.message);
           reject(error.message);
         });
     } catch (e) {
@@ -110,7 +110,7 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
     header.BlockNumber = buffInfoArray.length;
     header.TotalSize = size;
     let state = "uploading";
-    // console.log({ url, header });
+    console.log({ url, header });
     let res = { msg: "" };
     for (let i = 0; i < buffInfoArray.length; i++) {
       if (state == 'abort') {
@@ -120,7 +120,7 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
         let info = buffInfoArray[i];
         const buf = fs.createReadStream(filePath, info);
         let percentComplete = Math.ceil(((i + 1) / buffInfoArray.length) * 100);
-        header.BlockIndex = i + 1;
+        header.BlockIndex = i+1;
         let stime;
         for (let j = 0; j < 3; j++) {
           stime = new Date().getTime();
@@ -151,6 +151,7 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
           percentComplete,
           speed,
           speedUnit,
+          result: { msg: res.msg, data: res.data },
           controller: {
             abort: () => { state = 'abort'; }
           }
@@ -178,8 +179,9 @@ function postFile(url, fileObj, header) {
       axios
         .put(url, formData, { headers })
         .then((res) => {
-          // console.log('res.data',res.data);
-          resolve({ msg: "ok", data: res.data });
+          let msg = res.status == 200 ? 'ok' : res.data || response.statusText;
+          console.log('res.status', res.status);
+          resolve({ msg, data: res.data });
         })
         .catch((error) => {
           let msg = error.response?.data || error.message;
