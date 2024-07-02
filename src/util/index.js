@@ -96,6 +96,11 @@ function hexStringToUint8Array(hexString) {
 function getDataIfOk(result) {
   return result.msg === "ok" ? result.data : result;
 }
+async function queryBlockHeight(api) {
+  let ret = await api.query.system.number();
+  let blockHeight = ret.toJSON();
+  return blockHeight;
+}
 module.exports = {
   sleep,
   base58ToIP,
@@ -105,5 +110,6 @@ module.exports = {
   stringToByte,
   uint8ArrayToHex,
   uint8ArrayToIP,
-  uint8ArrayToString
+  uint8ArrayToString,
+  queryBlockHeight
 };

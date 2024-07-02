@@ -73,7 +73,7 @@ async function main() {
   // if (files.msg == "ok" && files.data.length > 0) {
   //   await downloadFile(oss, files.data[0].fileHash);
   // }
-  await uploadFile(oss, mnemonic, BUCKET_NAME);
+  // await uploadFile(oss, mnemonic, BUCKET_NAME);
 
   // let tmpFileHash = "0414617e35db30b114360d6ade6f6a980784c5c6052f6d8a8cae90b342d9ccb6";
   // await downloadFile(oss, tmpFileHash);
@@ -85,7 +85,11 @@ async function main() {
   // let bucketName = BUCKET_NAME;
   // if (result.data?.length) {
   //   let tmpFileHash = result.data[0].fileHash;
-  //   await queryFileMetadata(oss, tmpFileHash);
+  if(files.data.length>0){
+    let tmpFileHash=files.data[0].fileHash;
+    await queryFileMetadata(oss, tmpFileHash);
+  }
+    
   //   bucketName = result.data[0].bucketName;
   //   await downloadFile(oss, tmpFileHash);
   //   await deleteFile(oss,mnemonic, tmpFileHash);

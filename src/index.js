@@ -5,9 +5,9 @@
 const InitAPI = require("./init-api");
 const Common = require("./api/common");
 const Authorize = require("./api/authorize");
-const Space = require("./api/space");
 const Bucket = require("./api/bucket");
 const File = require("./api/file");
+const Territory = require("./api/territory");
 const defaultConfig = require("./default-config.js");
 
 module.exports = {
@@ -16,6 +16,6 @@ module.exports = {
   Bucket,
   Common,
   File,
-  Space,
+  Territory,
   defaultConfig,
 };

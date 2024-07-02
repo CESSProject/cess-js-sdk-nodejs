@@ -103,7 +103,7 @@ module.exports = class File extends ControlBase {
     }
   }
 
-  async uploadFile(mnemonic, filePath, bucketName, progressCb) {
+  async uploadFile(mnemonic, filePath, territoryName, bucketName, progressCb) {
     try {
       const pair = this.keyring.createFromUri(mnemonic);
       let accountId32 = pair.address;
@@ -124,13 +124,14 @@ module.exports = class File extends ControlBase {
       }
 
       const headers = {
-        BucketName: bucketName,
+        Territory: territoryName,
+        Bucket: bucketName,
         Account: accountId32,
         Message: message,
         Signature: sign,
       };
       const ret = await fileHelper.uploadByChunk(
-      // const ret = await fileHelper.upload(
+        // const ret = await fileHelper.upload(
         this.gatewayURL,
         filePath,
         headers,
