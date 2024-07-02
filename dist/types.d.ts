@@ -91,6 +91,7 @@ declare namespace CESS {
             subState?: (status: any) => void,
         ): Promise<any>;
         renewalTerritory(mnemonic: string, territoryName: string, days: number, subState?: (status: any) => void): Promise<any>;
+        renameTerritory(mnemonic: string, oldName: string, newName: string, subState?: (status: any) => void): Promise<any>;
     }
 
     class Authorize extends ControlBase {
