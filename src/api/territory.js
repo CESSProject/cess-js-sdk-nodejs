@@ -76,4 +76,8 @@ module.exports = class Territory extends ControlBase {
         const extrinsic = this.api.tx.storageHandler.territoryRename(oldName, newName);
         return await this.signAndSend(mnemonic, extrinsic, subState);
     }
+    async reactivateTerritory(mnemonic, territoryName, days, subState = null) {
+        const extrinsic = this.api.tx.storageHandler.reactivateTerritory(territoryName, days);
+        return await this.signAndSend(mnemonic, extrinsic, subState);
+    }
 };
