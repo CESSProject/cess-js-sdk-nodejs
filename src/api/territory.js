@@ -60,15 +60,15 @@ module.exports = class Territory extends ControlBase {
             };
         }
     }
-    async createTerritory(mnemonic, territoryName, gibCount, subState = null) {
-        const extrinsic = this.api.tx.storageHandler.mintTerritory(gibCount, territoryName);
+    async createTerritory(mnemonic, territoryName, gibCount, days = 30, subState = null) {
+        const extrinsic = this.api.tx.storageHandler.mintTerritory(gibCount, territoryName, days);
         return await this.signAndSend(mnemonic, extrinsic, subState);
     }
     async expandingTerritory(mnemonic, territoryName, gibCount, subState = null) {
         const extrinsic = this.api.tx.storageHandler.expandingTerritory(territoryName, gibCount);
         return await this.signAndSend(mnemonic, extrinsic, subState);
     }
-    async renewalTerritory(mnemonic, territoryName, days, subState = null) {
+    async renewalTerritory(mnemonic, territoryName, days = 30, subState = null) {
         const extrinsic = this.api.tx.storageHandler.renewalTerritory(territoryName, days);
         return await this.signAndSend(mnemonic, extrinsic, subState);
     }
@@ -76,7 +76,7 @@ module.exports = class Territory extends ControlBase {
         const extrinsic = this.api.tx.storageHandler.territoryRename(oldName, newName);
         return await this.signAndSend(mnemonic, extrinsic, subState);
     }
-    async reactivateTerritory(mnemonic, territoryName, days, subState = null) {
+    async reactivateTerritory(mnemonic, territoryName, days = 30, subState = null) {
         const extrinsic = this.api.tx.storageHandler.reactivateTerritory(territoryName, days);
         return await this.signAndSend(mnemonic, extrinsic, subState);
     }

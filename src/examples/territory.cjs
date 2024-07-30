@@ -36,9 +36,9 @@ async function main() {
     // result = await oss.renewalTerritory(mnemonic, name, 10, console.log);
     // console.log(result, "\n");
   } else {
-    // console.log("createTerritory:", gatewayAddr);
-    // result = await oss.createTerritory(mnemonic, "test1", 1, console.log);
-    // console.log(result, "\n");
+    console.log("createTerritory:", gatewayAddr);
+    result = await oss.createTerritory(mnemonic, "test1", 1, 1, console.log);
+    console.log(result, "\n");
 
   }
 
