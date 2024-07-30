@@ -61,6 +61,9 @@ module.exports = class Territory extends ControlBase {
         }
     }
     async createTerritory(mnemonic, territoryName, gibCount, days = 30, subState = null) {
+        if (days < 30) {
+            throw "Not less than 30 days";
+        }
         const extrinsic = this.api.tx.storageHandler.mintTerritory(gibCount, territoryName, days);
         return await this.signAndSend(mnemonic, extrinsic, subState);
     }
