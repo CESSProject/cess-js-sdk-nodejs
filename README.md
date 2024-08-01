@@ -102,9 +102,8 @@ This is the [well-known development account](https://github.com/substrate-develo
 ### CESS Testnet RPC Endpoints
 
 ```
-wss://testnet-rpc0.cess.cloud/ws/
-wss://testnet-rpc1.cess.cloud/ws/
-wss://testnet-rpc2.cess.cloud/ws/
+'wss://testnet-rpc.cess.cloud/ws/',
+'wss://testnet-rpc.cess.network/ws/',
 ```
 
 ### CESS Testnet Faucet
