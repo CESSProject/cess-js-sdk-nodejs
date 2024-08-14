@@ -103,7 +103,26 @@ module.exports = class File extends ControlBase {
     }
   }
 
-  async uploadFile(mnemonic, filePath, territoryName, bucketName, progressCb) {
+  async queryFileInfo(fileHash) {
+    try {
+      let ret = await this.api.query.fileBank.dealMap(fileHash);
+      let data = ret.toJSON();
+      data.fileSizeStr = formatterSize(data.fileSize);
+      return {
+        msg: "ok",
+        data,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        msg: "ok",
+        errMsg: error.message,
+        error: JSON.stringify(error),
+      };
+    }
+  }
+
+  async uploadFile(mnemonic, filePath, territoryName, progressCb) {
     try {
       const pair = this.keyring.createFromUri(mnemonic);
       let accountId32 = pair.address;
@@ -125,7 +144,7 @@ module.exports = class File extends ControlBase {
 
       const headers = {
         Territory: territoryName,
-        Bucket: bucketName,
+        Bucket: 'cess',
         Account: accountId32,
         Message: message,
         Signature: sign,
@@ -146,7 +165,7 @@ module.exports = class File extends ControlBase {
   }
 
   async downloadFile(fileHash, filePath) {
-    let url = this.gatewayURL + fileHash;
+    let url = this.gatewayURL + '/download/' + fileHash;
     let ret = await fileHelper.download(url, filePath, this.log);
     return ret;
   }

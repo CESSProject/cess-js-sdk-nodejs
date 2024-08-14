@@ -110,7 +110,7 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
     header.BlockNumber = buffInfoArray.length;
     header.TotalSize = size;
     let state = "uploading";
-    console.log({ url, header });
+    // console.log({ url, header });
     let res = { msg: "" };
     for (let i = 0; i < buffInfoArray.length; i++) {
       if (state == 'abort') {
@@ -120,11 +120,11 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
         let info = buffInfoArray[i];
         const buf = fs.createReadStream(filePath, info);
         let percentComplete = Math.ceil(((i + 1) / buffInfoArray.length) * 100);
-        header.BlockIndex = i+1;
+        header.BlockIndex = i;
         let stime;
         for (let j = 0; j < 3; j++) {
           stime = new Date().getTime();
-          res = await postFile(url, buf, header);
+          res = await postFile(url + "/chunks", buf, header);
           if (res.msg == 'ok') {
             // console.log(res);
             break;

@@ -5,7 +5,7 @@
 const { join: joinPath, resolve: resolvePath } = require("node:path");
 const { testnetConfig, wellKnownAcct } = require("./myconfig.cjs");
 
-const { File, Authorize, Bucket, InitAPI } = require("../");
+const { File, Authorize, Bucket, Territory, InitAPI } = require("../");
 const { getDataIfOk } = require("../util");
 const path = require("path");
 
@@ -26,9 +26,9 @@ async function queryFileMetadata(oss, fileHash) {
   console.log(getDataIfOk(result), "\n");
 }
 
-async function uploadFile(oss, mnemonic, bucketName) {
+async function uploadFile(oss, mnemonic, territoryName) {
   console.log("uploadFile:", LICENSE_PATH);
-  const result = await oss.uploadFile(mnemonic, "E:\\图片素材\\测试中文测试中文测试中文测2222.png", bucketName, console.log);
+  const result = await oss.uploadFile(mnemonic, "E:\\图片素材\\2.png", territoryName, console.log);
   console.log(result, "\n");
   return result;
 }
@@ -49,31 +49,39 @@ async function main() {
   const { api, keyring } = await InitAPI(testnetConfig);
   const { mnemonic, addr } = wellKnownAcct;
   const oss = new File(api, keyring, testnetConfig.gatewayURL, true);
+  const territory = new Territory(api, keyring, true);
+
+
+  // let info = await oss.queryFileInfo("c6bca58f17ecf6a01e10594f793928af48a714e1ae1ae7b7da650cf1ce7ad36d");
+  // console.log('file info', info);
 
   // console.log("authorize:");
   // const ossAuthorze = new Authorize(api, keyring);
   // let result = await ossAuthorze.authorize(mnemonic, gatewayAddr);
   // console.log(getDataIfOk(result), "\n");
 
-  console.log("queryBucketList:");
-  const ossBucket = new Bucket(api, keyring);
-  result = await ossBucket.queryBucketList(addr);
-  if (result.msg != 'ok') {
-    return console.log('query bucket error', result);
-  }
-  console.log('query bucket result', result);
-  if (result.data.length == 0) {
-    result = await ossBucket.createBucket(mnemonic, BUCKET_NAME);
-    console.log('createBucket result', result);
-  } else {
-    BUCKET_NAME = result.data[0].key;
-  }
-  let files = await queryFileList(oss, addr);
-  console.log({ files });
+  // console.log("queryBucketList:");
+  // const ossBucket = new Bucket(api, keyring);
+  // result = await ossBucket.queryBucketList(addr);
+  // if (result.msg != 'ok') {
+  //   return console.log('query bucket error', result);
+  // }
+  // console.log('query bucket result', result);
+  // if (result.data.length == 0) {
+  //   result = await ossBucket.createBucket(mnemonic, BUCKET_NAME);
+  //   console.log('createBucket result', result);
+  // } else {
+  //   BUCKET_NAME = result.data[0].key;
+  // }
+  let territoryList=await territory.queryMyTerritorys(addr);
+  console.log("territoryList",territoryList);
+  // let files = await queryFileList(oss, addr);
+  // console.log({ files });
   // if (files.msg == "ok" && files.data.length > 0) {
   //   await downloadFile(oss, files.data[0].fileHash);
   // }
-  // await uploadFile(oss, mnemonic, BUCKET_NAME);
+  // console.log('start upload file')
+  await uploadFile(oss, mnemonic, territoryList.data[0].name);
 
   // let tmpFileHash = "0414617e35db30b114360d6ade6f6a980784c5c6052f6d8a8cae90b342d9ccb6";
   // await downloadFile(oss, tmpFileHash);
@@ -85,11 +93,11 @@ async function main() {
   // let bucketName = BUCKET_NAME;
   // if (result.data?.length) {
   //   let tmpFileHash = result.data[0].fileHash;
-  if(files.data.length>0){
-    let tmpFileHash=files.data[0].fileHash;
-    await queryFileMetadata(oss, tmpFileHash);
-  }
-    
+  // if(files.data.length>0){
+  //   let tmpFileHash=files.data[0].fileHash;
+  //   await queryFileMetadata(oss, tmpFileHash);
+  // }
+
   //   bucketName = result.data[0].bucketName;
   //   await downloadFile(oss, tmpFileHash);
   //   await deleteFile(oss,mnemonic, tmpFileHash);
