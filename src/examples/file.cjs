@@ -28,7 +28,8 @@ async function queryFileMetadata(oss, fileHash) {
 
 async function uploadFile(oss, mnemonic, territoryName) {
   console.log("uploadFile:", LICENSE_PATH);
-  const result = await oss.uploadFile(mnemonic, "E:\\图片素材\\2.png", territoryName, console.log);
+  territoryName="TW_TEST_1";
+  const result = await oss.uploadFile(mnemonic, "E:\\w1.zip", territoryName, console.log);
   console.log(result, "\n");
   return result;
 }
@@ -48,7 +49,8 @@ async function deleteFile(oss, accountId32, mnemonic, fileHash) {
 async function main() {
   const { api, keyring } = await InitAPI(testnetConfig);
   const { mnemonic, addr } = wellKnownAcct;
-  const oss = new File(api, keyring, testnetConfig.gatewayURL, true);
+  let gatewayURL="http://192.168.110.247:8080";
+  const oss = new File(api, keyring, gatewayURL, true);
   const territory = new Territory(api, keyring, true);
 
 
@@ -57,7 +59,7 @@ async function main() {
 
   // console.log("authorize:");
   // const ossAuthorze = new Authorize(api, keyring);
-  // let result = await ossAuthorze.authorize(mnemonic, gatewayAddr);
+  // let result = await ossAuthorze.authorize(mnemonic, "cXhwBytXqrZLr1qM5NHJhCzEMckSTzNKw17ci2aHft6ETSQm9");
   // console.log(getDataIfOk(result), "\n");
 
   // console.log("queryBucketList:");

@@ -99,7 +99,7 @@ async function upload(url, filePath, header, log, progressCb) {
     }
   });
 }
-async function uploadByChunk(url, filePath, header, log, progressCb) {
+async function uploadByChunkV1(url, filePath, header, log, progressCb) {
   try {
     const fileInfo = fs.statSync(filePath);
     const size = fileInfo.size;
@@ -166,28 +166,125 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
     return { msg: e.message };
   }
 }
+async function uploadByChunk(url, filePath, header, log, progressCb) {
+  try {
+    const fileInfo = fs.statSync(filePath);
+    const size = fileInfo.size;
+    const buffInfoArray = getSliceInfoArr(size, CHUNK_SIZE);
+    // console.log(buffInfoArray)    
+    let arr = filePath.split('\\').join('/').split('/');
+    header.FileName = encodeURIComponent(arr[arr.length - 1]);
+    // header.BlockNumber = buffInfoArray.length;
+    // header["Content-Length"] = size;
+    let state = "uploading";
+    // console.log({ url, header });
+    let res = { msg: "" };
+    for (let i = 0; i < buffInfoArray.length; i++) {
+      if (state == 'abort') {
+        return { msg: "abort" };
+      }
+      try {
+        let info = buffInfoArray[i];
+        const buf = fs.createReadStream(filePath, info);
+        // console.log("buf.length", buf.length, filePath, info);
+        let percentComplete = Math.ceil(((i + 1) / buffInfoArray.length) * 100);
+        // header.BlockIndex = i;
+        header['Content-Range'] = `bytes ${info.start}-${info.end}/${size}`;
+        let stime;
+        for (let j = 0; j < 3; j++) {
+          stime = new Date().getTime();
+          res = await postFile(url + "/resume/" + header.FileName, buf, header);
+          if (res.msg == 'ok') {
+            // console.log(res);
+            break;
+          } else {
+            console.log('api error', res.msg, 'retrying...');
+            await util.sleep(1000);
+          }
+        }
+        if (res.msg != 'ok') {
+          return res;
+        }
+
+        let endTime = new Date().getTime();
+        let dTime = (endTime - stime) / 1000;
+        let speed = (info.end - info.start) / dTime;
+        speed = speed / 1024;
+        let speedUnit = "KB/s";
+        if (speed > 1024) {
+          speed = speed / 1024;
+          speedUnit = "MB/s";
+        }
+        speed = speed.toFixed(1);
+        progressCb({
+          percentComplete,
+          speed,
+          speedUnit,
+          result: { msg: res.msg, data: res.data },
+          controller: {
+            abort: () => { state = 'abort'; }
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return res;
+  } catch (e) {
+    log(e);
+    return { msg: e.message };
+  }
+}
 function postFile(url, fileObj, header) {
   return new Promise(async (resolve, reject) => {
     try {
+      console.log(url, header);
       const formData = new FormDataNode();
       formData.append("file", fileObj);
       const headers = formData.getHeaders();
       Object.keys(header).forEach((k) => {
         headers[k] = header[k];
       });
-      // console.log({ url, headers });
+      // console.log({formData });
       axios
         .put(url, formData, { headers })
         .then((res) => {
-          let msg = res.status == 200 ? 'ok' : res.data || response.statusText;
-          console.log('res.status', res.status);
+          let msg = res.status == 200 || res.status === 308 ? 'ok' : res.data || response.statusText;
+          // console.log('res.status', res.status);
           resolve({ msg, data: res.data });
         })
         .catch((error) => {
           let msg = error.response?.data || error.message;
-          console.error("Upload error：", msg);
-          resolve({ msg });
+          if (error.response?.status == 308 || msg.indexOf("Received bytes") == 0) {
+            resolve({ msg: "ok" });
+          } else {
+            console.error("Upload error：", msg);
+            resolve({ msg });
+          }
         });
+
+      // fetch(url, {
+      //   method: 'put',
+      //   headers,
+      //   body: formData
+      // })
+      //   .then(response => {
+      //     console.log("status", response.status);
+      //     return response.text();
+      //   })
+      //   .then(data => {
+      //     resolve({ msg: "ok", data });
+      //   })
+      //   .catch(error => {
+      //     console.error('Error:', error);
+      //     let msg = error.response?.data || error.message;
+      //     if (error.response?.status == 308 || msg.indexOf("Received bytes") == 0) {
+      //       resolve({ msg: "ok" });
+      //     } else {
+      //       console.error("Upload error：", msg);
+      //       resolve({ msg });
+      //     }
+      //   });
     } catch (e) {
       console.error("Upload fail：", e.message);
       resolve({ msg: e.message });
@@ -198,13 +295,9 @@ function getSliceInfoArr(size, blockSize = 10485760) {
   let blockCount = Math.ceil(size / blockSize);
   const arr = [];
   for (let i = 0; i < blockCount; i++) {
-    const o = {
-      start: i * blockSize,
-      end: (i + 1) * blockSize - 1,
-    };
-    if (o.end >= size - 1) {
-      o.end = size - 1;
-    }
+    let start = i * blockSize;
+    let end = Math.min(start + blockSize, size - 1);
+    const o = { start, end };
     if (o.end >= o.start) {
       arr.push(o);
     }
