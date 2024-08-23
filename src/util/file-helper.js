@@ -174,6 +174,7 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
     // console.log(buffInfoArray)    
     let arr = filePath.split('\\').join('/').split('/');
     header.FileName = encodeURIComponent(arr[arr.length - 1]);
+    header["Content-Type"] = "application/octet-stream";
     // header.BlockNumber = buffInfoArray.length;
     // header["Content-Length"] = size;
     let state = "uploading";
@@ -239,15 +240,16 @@ function postFile(url, fileObj, header) {
   return new Promise(async (resolve, reject) => {
     try {
       console.log(url, header);
-      const formData = new FormDataNode();
-      formData.append("file", fileObj);
-      const headers = formData.getHeaders();
+      // const formData = new FormDataNode();
+      // formData.append("file", fileObj);
+      // const headers = formData.getHeaders();
+      const headers = {};
       Object.keys(header).forEach((k) => {
         headers[k] = header[k];
       });
       // console.log({formData });
       axios
-        .put(url, formData, { headers })
+        .put(url, fileObj, { headers })
         .then((res) => {
           let msg = res.status == 200 || res.status === 308 ? 'ok' : res.data || response.statusText;
           // console.log('res.status', res.status);

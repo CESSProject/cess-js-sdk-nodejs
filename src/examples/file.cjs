@@ -29,7 +29,7 @@ async function queryFileMetadata(oss, fileHash) {
 async function uploadFile(oss, mnemonic, territoryName) {
   console.log("uploadFile:", LICENSE_PATH);
   territoryName="TW_TEST_1";
-  const result = await oss.uploadFile(mnemonic, "E:\\w1.zip", territoryName, console.log);
+  const result = await oss.uploadFile(mnemonic, "E:\\q3.mp4", territoryName, console.log);
   console.log(result, "\n");
   return result;
 }
@@ -75,15 +75,15 @@ async function main() {
   // } else {
   //   BUCKET_NAME = result.data[0].key;
   // }
-  let territoryList=await territory.queryMyTerritorys(addr);
-  console.log("territoryList",territoryList);
+  // let territoryList=await territory.queryMyTerritorys(addr);
+  // console.log("territoryList",territoryList);
   // let files = await queryFileList(oss, addr);
   // console.log({ files });
   // if (files.msg == "ok" && files.data.length > 0) {
   //   await downloadFile(oss, files.data[0].fileHash);
   // }
   // console.log('start upload file')
-  await uploadFile(oss, mnemonic, territoryList.data[0].name);
+  await uploadFile(oss, mnemonic, "");
 
   // let tmpFileHash = "0414617e35db30b114360d6ade6f6a980784c5c6052f6d8a8cae90b342d9ccb6";
   // await downloadFile(oss, tmpFileHash);
