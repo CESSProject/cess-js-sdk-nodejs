@@ -29,14 +29,14 @@ async function queryFileMetadata(oss, fileHash) {
 async function uploadFile(oss, mnemonic, territoryName) {
   console.log("uploadFile:", LICENSE_PATH);
   territoryName="TW_TEST_1";
-  const result = await oss.uploadFile(mnemonic, "E:\\q3.mp4", territoryName, console.log);
+  const result = await oss.uploadFile(mnemonic, "E:\\test12.txt", territoryName, console.log);
   console.log(result, "\n");
   return result;
 }
 
 async function downloadFile(oss, fileHash) {
   console.log("downloadFile:");
-  const result = await oss.downloadFile(fileHash, path.join(__dirname, "tmp.txt"));
+  const result = await oss.downloadFile(fileHash, path.join(__dirname, "111.mp4"));
   console.log(result.msg === "ok" ? result.data : result);
 }
 
@@ -49,8 +49,8 @@ async function deleteFile(oss, accountId32, mnemonic, fileHash) {
 async function main() {
   const { api, keyring } = await InitAPI(testnetConfig);
   const { mnemonic, addr } = wellKnownAcct;
-  let gatewayURL="http://192.168.110.247:8080";
-  const oss = new File(api, keyring, gatewayURL, true);
+  // let gatewayURL="http://192.168.110.247:8080";
+  const oss = new File(api, keyring, testnetConfig.gatewayURL, true);
   const territory = new Territory(api, keyring, true);
 
 
@@ -59,7 +59,7 @@ async function main() {
 
   // console.log("authorize:");
   // const ossAuthorze = new Authorize(api, keyring);
-  // let result = await ossAuthorze.authorize(mnemonic, "cXhwBytXqrZLr1qM5NHJhCzEMckSTzNKw17ci2aHft6ETSQm9");
+  // let result = await ossAuthorze.authorize(mnemonic, "cXjy16zpi3kFU6ThDHeTifpwHop4YjaF3EvYipTeJSbTjmayP");
   // console.log(getDataIfOk(result), "\n");
 
   // console.log("queryBucketList:");
@@ -85,7 +85,7 @@ async function main() {
   // console.log('start upload file')
   await uploadFile(oss, mnemonic, "");
 
-  // let tmpFileHash = "0414617e35db30b114360d6ade6f6a980784c5c6052f6d8a8cae90b342d9ccb6";
+  // let tmpFileHash = "16724d72d5ecb4baca89f5834ebd078bae0ed12f922f45e05e05ab36b1fe3963";
   // await downloadFile(oss, tmpFileHash);
 
   // let result = await queryFileList(oss, addr);

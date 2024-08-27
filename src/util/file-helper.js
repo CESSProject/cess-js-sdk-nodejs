@@ -7,8 +7,8 @@ const fs = require("fs");
 const FormDataNode = require("form-data");
 const axios = require("axios");
 const util = require("../util");
-const CHUNK_SIZE = 2 * 1024 * 1024;
-
+const CHUNK_SIZE = 2;
+// const CHUNK_SIZE = 2 * 1024 * 1024;
 function download(url, savePath, log) {
   return new Promise((resolve, reject) => {
     try {
@@ -171,12 +171,12 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
     const fileInfo = fs.statSync(filePath);
     const size = fileInfo.size;
     const buffInfoArray = getSliceInfoArr(size, CHUNK_SIZE);
-    // console.log(buffInfoArray)    
+    console.log(size, buffInfoArray)
     let arr = filePath.split('\\').join('/').split('/');
     header.FileName = encodeURIComponent(arr[arr.length - 1]);
     header["Content-Type"] = "application/octet-stream";
     // header.BlockNumber = buffInfoArray.length;
-    // header["Content-Length"] = size;
+    header["Content-Length"] = size;
     let state = "uploading";
     // console.log({ url, header });
     let res = { msg: "" };
@@ -247,7 +247,7 @@ function postFile(url, fileObj, header) {
       Object.keys(header).forEach((k) => {
         headers[k] = header[k];
       });
-      // console.log({formData });
+      // console.log({ fileObj: fileObj });
       axios
         .put(url, fileObj, { headers })
         .then((res) => {
@@ -298,7 +298,7 @@ function getSliceInfoArr(size, blockSize = 10485760) {
   const arr = [];
   for (let i = 0; i < blockCount; i++) {
     let start = i * blockSize;
-    let end = Math.min(start + blockSize, size - 1);
+    let end = Math.min(start + blockSize - 1, size - 1);
     const o = { start, end };
     if (o.end >= o.start) {
       arr.push(o);
