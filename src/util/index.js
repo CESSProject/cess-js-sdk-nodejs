@@ -4,6 +4,7 @@
  *
  */
 const bs58 = require("bs58");
+const moment = require("moment");
 
 const uint8ArrayToHex = (bytes) =>
   "0x" + bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
@@ -101,6 +102,13 @@ async function queryBlockHeight(api) {
   let blockHeight = ret.toJSON();
   return blockHeight;
 }
+async function blockHeightToDatetime(api, blockHeight) {
+  if (!blockHeight) {
+    return moment().format("YYYY-MM-DD HH:mm:ss");
+  }
+  let currBlockHeight = await queryBlockHeight(api);
+  return moment().add(6 * (blockHeight - currBlockHeight), "s").format("YYYY-MM-DD HH:mm:ss");
+}
 module.exports = {
   sleep,
   base58ToIP,
@@ -111,5 +119,6 @@ module.exports = {
   uint8ArrayToHex,
   uint8ArrayToIP,
   uint8ArrayToString,
-  queryBlockHeight
+  queryBlockHeight,
+  blockHeightToDatetime
 };

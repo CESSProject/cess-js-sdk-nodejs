@@ -5,8 +5,10 @@
 const ControlBase = require("../control-base");
 const fileHelper = require("../util/file-helper");
 const bs58 = require("bs58");
+const moment = require("moment");
 const { formatterSize } = require("../util/formatter");
 const { hexToString } = require("@polkadot/util");
+const { queryBlockHeight, blockHeightToDatetime } = require("../util/index.js");
 
 module.exports = class File extends ControlBase {
   constructor(api, keyring, gatewayURL, isDebug = false) {
@@ -78,6 +80,7 @@ module.exports = class File extends ControlBase {
       if (data && data.owner && data.owner.length > 0) {
         for (let i = 0; i < data.owner.length; i++) {
           let n = hu.owner[i].fileName;
+          let territoryName = hu.owner[i].territoryName;
           if (n.indexOf("0x") == 0) {
             try {
               n = hexToString(n);
@@ -85,9 +88,27 @@ module.exports = class File extends ControlBase {
               console.error(e);
             }
           }
-          data.owner[i].fileName = n;
+          if (territoryName.indexOf("0x") == 0) {
+            try {
+              territoryName = hexToString(territoryName);
+            } catch (e) {
+              console.error(e);
+            }
+          }
+          if (n) {
+            data.owner[i].fileName = n;
+            data.title = n;
+            data.fileName = n;
+          }
           data.owner[i].bucketName = hu.owner[i].bucketName;
+          data.owner[i].territoryName = territoryName;
+          data.bucketName = hu.owner[i].bucketName;
+          data.territoryName = territoryName;
         }
+        data.fid = fileHash;
+        data.fileSizeStr = formatterSize(data.fileSize);
+        data.uploadTime = await blockHeightToDatetime(this.api, data.completion);
+        delete data.segmentList;
       }
       return {
         msg: "ok",
@@ -96,18 +117,37 @@ module.exports = class File extends ControlBase {
     } catch (error) {
       console.error(error);
       return {
-        msg: "ok",
+        msg: "error",
         errMsg: error.message,
         error: JSON.stringify(error),
       };
     }
   }
-
-  async queryFileInfo(fileHash) {
+  async queryFileDealMap(fileHash) {
     try {
       let ret = await this.api.query.fileBank.dealMap(fileHash);
-      let data = ret.toJSON();
-      data.fileSizeStr = formatterSize(data.fileSize);
+      if (!ret) {
+        return { msg: 'file not found' };
+      }
+      let json = ret.toJSON();
+      let hu = ret.toHuman();
+      if (!json) {
+        return { msg: 'file not found' };
+      }
+      let currBlockHeight = await queryBlockHeight(this.api);
+      let data = {
+        fid: fileHash,
+        fileSize: json?.fileSize,
+        fileSizeStr: formatterSize(json?.fileSize),
+        owner: [hu.user],
+        bucketName: hu.user?.bucketName,
+        fileName: hu.user?.fileName,
+        title: hu.user?.fileName,
+        territoryName: hu.user?.territoryName,
+        stat: "Pending",
+        completion: currBlockHeight,
+        uploadTime: moment().format("YYYY-MM-DD HH:mm:ss")
+      };
       return {
         msg: "ok",
         data,
@@ -115,11 +155,21 @@ module.exports = class File extends ControlBase {
     } catch (error) {
       console.error(error);
       return {
-        msg: "ok",
+        msg: "error",
         errMsg: error.message,
         error: JSON.stringify(error),
       };
     }
+  }
+  async queryFileInfo(fileHash) {
+    let ret = await this.queryFileMetadata(fileHash);
+    // console.log("queryFileMetadata", ret);
+    if (ret.msg == 'ok' && ret.data) {
+      return ret;
+    }
+    ret = await this.queryFileDealMap(fileHash);
+    // console.log("queryFileDealMap", ret);
+    return ret;
   }
 
   async uploadFile(mnemonic, filePath, territoryName, progressCb) {

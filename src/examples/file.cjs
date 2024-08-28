@@ -28,7 +28,7 @@ async function queryFileMetadata(oss, fileHash) {
 
 async function uploadFile(oss, mnemonic, territoryName) {
   console.log("uploadFile:", LICENSE_PATH);
-  territoryName="TW_TEST_1";
+  territoryName = "TW_TEST_1";
   const result = await oss.uploadFile(mnemonic, "E:\\test12.txt", territoryName, console.log);
   console.log(result, "\n");
   return result;
@@ -54,8 +54,13 @@ async function main() {
   const territory = new Territory(api, keyring, true);
 
 
-  // let info = await oss.queryFileInfo("c6bca58f17ecf6a01e10594f793928af48a714e1ae1ae7b7da650cf1ce7ad36d");
-  // console.log('file info', info);
+  // let fid="0c2f9acc33c9e2c8071b23e56e8a06b6b15979266c888d4f28f1ba60b10714a5";
+  let fid="96328ebdc1c72d04b7bdef0f65485588cce3aef6394c372a579f7396b81c52ea";
+  let info = await oss.queryFileInfo(fid);
+  console.log('file info1',JSON.stringify(info,null,2));
+
+  info = await oss.queryFileMetadata(fid);
+  console.log('file info2',JSON.stringify(info,null,2));
 
   // console.log("authorize:");
   // const ossAuthorze = new Authorize(api, keyring);
@@ -83,7 +88,7 @@ async function main() {
   //   await downloadFile(oss, files.data[0].fileHash);
   // }
   // console.log('start upload file')
-  await uploadFile(oss, mnemonic, "");
+  // await uploadFile(oss, mnemonic, "");
 
   // let tmpFileHash = "16724d72d5ecb4baca89f5834ebd078bae0ed12f922f45e05e05ab36b1fe3963";
   // await downloadFile(oss, tmpFileHash);
