@@ -7,8 +7,8 @@ const fs = require("fs");
 const FormDataNode = require("form-data");
 const axios = require("axios");
 const util = require("../util");
-const CHUNK_SIZE = 2;
-// const CHUNK_SIZE = 2 * 1024 * 1024;
+// const CHUNK_SIZE = 2;
+const CHUNK_SIZE = 2 * 1024 * 1024;
 function download(url, savePath, log) {
   return new Promise((resolve, reject) => {
     try {
@@ -186,7 +186,8 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
       }
       try {
         let info = buffInfoArray[i];
-        const buf = fs.createReadStream(filePath, info);
+        // const buf = fs.createReadStream(filePath, info);
+        const buf = fs.readFileSync(filePath, info);
         // console.log("buf.length", buf.length, filePath, info);
         let percentComplete = Math.ceil(((i + 1) / buffInfoArray.length) * 100);
         // header.BlockIndex = i;
@@ -217,11 +218,17 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
           speedUnit = "MB/s";
         }
         speed = speed.toFixed(1);
+        let json = res.data;
+        try {
+          if (typeof json == "string") {
+            json = JSON.parse(json);
+          }
+        } catch (e) { }
         progressCb({
           percentComplete,
           speed,
           speedUnit,
-          result: { msg: res.msg, data: res.data },
+          result: res,
           controller: {
             abort: () => { state = 'abort'; }
           }
@@ -248,37 +255,14 @@ function postFile(url, fileObj, header) {
         headers[k] = header[k];
       });
       // console.log({ fileObj: fileObj });
-      axios
-        .put(url, fileObj, { headers })
-        .then((res) => {
-          let msg = res.status == 200 || res.status === 308 ? 'ok' : res.data || response.statusText;
-          // console.log('res.status', res.status);
-          resolve({ msg, data: res.data });
-        })
-        .catch((error) => {
-          let msg = error.response?.data || error.message;
-          if (error.response?.status == 308 || msg.indexOf("Received bytes") == 0) {
-            resolve({ msg: "ok" });
-          } else {
-            console.error("Upload error：", msg);
-            resolve({ msg });
-          }
-        });
-
-      // fetch(url, {
-      //   method: 'put',
-      //   headers,
-      //   body: formData
-      // })
-      //   .then(response => {
-      //     console.log("status", response.status);
-      //     return response.text();
+      // axios
+      //   .put(url, fileObj, { headers })
+      //   .then((res) => {
+      //     let msg = res.status == 200 || res.status === 308 ? 'ok' : res.data || response.statusText;
+      //     // console.log('res.status', res.status);
+      //     resolve({ msg, data: res.data });
       //   })
-      //   .then(data => {
-      //     resolve({ msg: "ok", data });
-      //   })
-      //   .catch(error => {
-      //     console.error('Error:', error);
+      //   .catch((error) => {
       //     let msg = error.response?.data || error.message;
       //     if (error.response?.status == 308 || msg.indexOf("Received bytes") == 0) {
       //       resolve({ msg: "ok" });
@@ -287,6 +271,28 @@ function postFile(url, fileObj, header) {
       //       resolve({ msg });
       //     }
       //   });
+
+      fetch(url, {
+        method: 'put',
+        headers,
+        body: fileObj
+      })
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          resolve(data);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          let msg = error.response?.data || error.message;
+          if (error.response?.status == 308 || msg.indexOf("Received bytes") == 0) {
+            resolve({ msg: "ok" });
+          } else {
+            console.error("Upload error：", msg);
+            resolve({ msg });
+          }
+        });
     } catch (e) {
       console.error("Upload fail：", e.message);
       resolve({ msg: e.message });

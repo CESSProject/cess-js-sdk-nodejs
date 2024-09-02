@@ -14,7 +14,7 @@ module.exports = class File extends ControlBase {
   constructor(api, keyring, gatewayURL, isDebug = false) {
     super(api, keyring, isDebug);
     if (!gatewayURL) {
-      gatewayURL = "http://deoss-pub-gateway.cess.cloud/";
+      gatewayURL = "http://deoss-sgp.cess.network/";
     }
     this.gatewayURL = gatewayURL;
     // this.gatewayURL="http://172.16.2.191:8080/";
