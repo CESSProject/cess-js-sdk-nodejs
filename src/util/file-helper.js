@@ -278,9 +278,16 @@ function postFile(url, fileObj, header) {
         body: fileObj
       })
         .then(response => {
-          return response.json();
+          return response.text();
         })
         .then(data => {
+          if (typeof data == 'string') {
+            try {
+              data = JSON.parse(data);
+            } catch (e) {
+              data = { msg: "ok", data }
+            }
+          }
           resolve(data);
         })
         .catch(error => {
