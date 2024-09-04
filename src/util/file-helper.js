@@ -171,7 +171,7 @@ async function uploadByChunk(url, filePath, header, log, progressCb) {
     const fileInfo = fs.statSync(filePath);
     const size = fileInfo.size;
     const buffInfoArray = getSliceInfoArr(size, CHUNK_SIZE);
-    console.log(size, buffInfoArray)
+    // console.log(size, buffInfoArray)
     let arr = filePath.split('\\').join('/').split('/');
     header.FileName = encodeURIComponent(arr[arr.length - 1]);
     header["Content-Type"] = "application/octet-stream";
