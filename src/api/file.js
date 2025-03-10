@@ -32,7 +32,6 @@ module.exports = class File extends ControlBase {
           let owe = tmp.data.owner.find((t) => t.user == accountId32);
           if (owe) {
             file.fileName = owe.fileName;
-            file.bucketName = owe.bucketName;
           }
           file.fileSizeStr = formatterSize(tmp.data.fileSize);
           file.stat = tmp.data.stat;
@@ -99,10 +98,8 @@ module.exports = class File extends ControlBase {
             data.owner[i].fileName = n;
             data.title = n;
             data.fileName = n;
-          }
-          data.owner[i].bucketName = hu.owner[i].bucketName;
+          }  
           data.owner[i].territoryName = territoryName;
-          data.bucketName = hu.owner[i].bucketName;
           data.territoryName = territoryName;
         }
         data.fid = fileHash;
@@ -140,7 +137,6 @@ module.exports = class File extends ControlBase {
         fileSize: json?.fileSize,
         fileSizeStr: formatterSize(json?.fileSize),
         owner: [hu.user],
-        bucketName: hu.user?.bucketName,
         fileName: hu.user?.fileName,
         title: hu.user?.fileName,
         territoryName: hu.user?.territoryName,
@@ -194,7 +190,6 @@ module.exports = class File extends ControlBase {
 
       const headers = {
         Territory: territoryName,
-        Bucket: 'cess',
         Account: accountId32,
         Message: message,
         Signature: sign,
@@ -215,7 +210,7 @@ module.exports = class File extends ControlBase {
   }
 
   async downloadFile(fileHash, filePath) {
-    let url = this.gatewayURL + '/download/' + fileHash;
+    let url = this.gatewayURL + '/file/download/' + fileHash;
     let ret = await fileHelper.download(url, filePath, this.log);
     return ret;
   }

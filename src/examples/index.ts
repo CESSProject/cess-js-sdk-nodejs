@@ -4,7 +4,7 @@ import { execFile } from "node:child_process";
 
 // These files are relative to the script path. Surely we can use glob, but let's do it
 // meticulously here, enabling our examples one-by-one.
-const EXAMPLE_FILES = ["authorize.js", "bucket.js", "file.cjs", "space.cjs", "space.mjs"];
+const EXAMPLE_FILES = ["authorize.js", "file.cjs", "space.cjs", "space.mjs"];
 
 const execAsync = promisify(execFile);
 
